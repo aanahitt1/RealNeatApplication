@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>res/transfer_rna.png</file>
+        <file>res/ribosome_ao_small_st.jpg</file>
+    </qresource>
+</RCC>

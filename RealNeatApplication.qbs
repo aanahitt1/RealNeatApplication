@@ -2,6 +2,7 @@ import qbs.FileInfo
 
 QtApplication {
     Depends { name: "Qt.widgets" }
+    Depends { name: "Qt.xml" }
 
     // The following define makes your compiler emit warnings if you use
     // any Qt feature that has been marked deprecated (the exact warnings
@@ -16,10 +17,16 @@ QtApplication {
     ]
 
     files: [
+        "Config.xml",
+        "RESOURCE.qrc",
+        "hovermenu.cpp",
+        "hovermenu.h",
         "main.cpp",
         "mainwindow.cpp",
         "mainwindow.h",
         "mainwindow.ui",
+        "parsexml.cpp",
+        "parsexml.h",
     ]
 
     install: true
