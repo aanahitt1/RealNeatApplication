@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QListWidget>
+#include <QGridLayout>
+#include <QLabel>
 #include "parsexml.h"
 
 QT_BEGIN_NAMESPACE
@@ -29,10 +31,12 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_listItem_changed(QListWidgetItem* list, QLabel* description, QString* names, QString* desc);
+
 private:
     Ui::MainWindow *ui;
     void createFileBar();
-
+    QDialog* createAlgoList();
 
 };
 #endif // MAINWINDOW_H

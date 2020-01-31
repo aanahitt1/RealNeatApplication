@@ -17,30 +17,73 @@ MainWindow::~MainWindow()
 
 void MainWindow::createFileBar()
 {
-    QAction *quit = new QAction("&Quit", this);
-    //QAction* Algorithms = new QAction("&Algorithms", this);
+      QAction *quit = new QAction("&Quit", this);
+      QAction* Algorithms = new QAction("&Algorithms", this);
 
-    QMenu *FileBar;
-    FileBar = menuBar()->addMenu("&File");
-    //FileBar->addAction(Algorithms);
-    FileBar->addAction(quit);
+      //Creating menu
+      QMenu *FileBar;
+      FileBar = menuBar()->addMenu("&File");
+      FileBar->addAction(Algorithms);
+      FileBar->addAction(quit);
 
-    QListWidget* algoList = new QListWidget(this);
+      connect(quit, &QAction::triggered, qApp, QApplication::quit);
 
-    connect(quit, &QAction::triggered, qApp, QApplication::quit);
+      QDialog* listDialog = createAlgoList();
+
+      connect(Algorithms, &QAction::triggered, listDialog, &QDialog::show);
+
+}
+
+QDialog* MainWindow::createAlgoList() {
+
+    //Create the dialog window so it looks good.
+    QDialog* list = new QDialog();
+    list->resize(500, 300);
+    QGridLayout* back = new QGridLayout(list);
+    QListWidget* algoList = new QListWidget();
+    QPushButton* ok = new QPushButton("&OK");
+    QLabel* description = new QLabel();
+    description->setWordWrap(true);
+    back->cellRect(3, 2);
+    back->setColumnMinimumWidth(2, 250);
+    back->setRowMinimumHeight(1, 25);
+    back->setRowMinimumHeight(2, 150);
+    back->setRowMinimumHeight(3, 25);
+    back->addWidget(new QLabel("Algorithms"), 1, 1);
+    back->addWidget(algoList, 2, 1);
+    back->addWidget(ok, 3, 1);
+    back->addWidget(description, 2, 2);
+
+    connect(ok, &QPushButton::clicked, list, &QDialog::hide);
 
     ParseXML* gopher = new ParseXML();
     QString* names = gopher->getInfo("C:\\Users\\Anahit\\Documents\\RealNeatApplication\\Config.xml", "name");
-    //QString* desc = gopher->getInfo("C:\\Users\\Anahit\\Documents\\RealNeatApplication\\Config.xml", "desc");
+    QString* desc = gopher->getInfo("C:\\Users\\Anahit\\Documents\\RealNeatApplication\\Config.xml", "desc");
 
+    //Populate list
     int i =0;
     while(names[i] != "NON") {
         algoList->addItem(names[i]);
+        QListWidgetItem* item = algoList->item(i);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(Qt::Unchecked);
         i++;
     }
 
-    //connect(Algorithms, &QAction::triggered, algoList);
+    connect(algoList, &QListWidget::itemPressed, [=](QListWidgetItem* item) {on_listItem_changed(item, description, names, desc);});
 
+    return list;
+}
+
+void MainWindow::on_listItem_changed(QListWidgetItem* list, QLabel* description, QString* names, QString* desc) {
+
+    int i = 0;
+    while(names[i] != "NON") {
+        if(names[i] == list->text()) {
+            description->setText(desc[i]);
+        }
+        i++;
+    }
 }
 
 void MainWindow::on_pushButton_clicked()
