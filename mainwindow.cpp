@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    file_path = "";
+    algoList = NULL;
     createFileBar();
     setWindowTitle("Real Neat Application");
 }
@@ -40,7 +42,7 @@ QDialog* MainWindow::createAlgoList() {
     QDialog* list = new QDialog();
     list->resize(500, 300);
     QGridLayout* back = new QGridLayout(list);
-    QListWidget* algoList = new QListWidget();
+    algoList = new QListWidget();
     QPushButton* ok = new QPushButton("&OK");
     QLabel* description = new QLabel();
     description->setWordWrap(true);
@@ -88,7 +90,7 @@ void MainWindow::on_listItem_changed(QListWidgetItem* list, QLabel* description,
 
 void MainWindow::on_pushButton_clicked()
 {
-    QString sequence = QInputDialog::getText(this, "Sequence", "Insert RNA sequence: ");
+    QString sequence = QInputDialog::getText(this, "Sequence", "Insert RNA sequencce: ");
     sequence = sequence.toUpper();
     int i = 0;
     while(sequence[i]!=NULL) {
@@ -101,7 +103,7 @@ void MainWindow::on_pushButton_clicked()
         i++;
     }
     //Turn the string into a FASTA file
-    //Pass the FASTA file to our algorithm
+    //Set file_path to wherever we save it.
 }
 
 void MainWindow::on_pushButton_2_clicked()
@@ -109,6 +111,30 @@ void MainWindow::on_pushButton_2_clicked()
     QString filename = QFileDialog::getOpenFileName(this, "Open Sequence", "C:\\documents", "Text files (*.txt);;FASTA files (*.FASTA)");
     if(filename.contains(".txt")) {
         //turn it into a FASTA file
+        //Save it somewhere
+        //Set file_path to where we saved it.
+    } else {
+        file_path = filename;
     }
-    //Pass the FASTA file to the algorithm.
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    if(file_path == "") {
+        QMessageBox error;
+        error.critical(this, "ERROR", "No sequence chosen.");
+        return;
+    }
+    QList<int>* checked = new QList<int>();
+    for (int i = 0; i < algoList->count(); i++) {
+        if(algoList->item(i)->checkState() == Qt::Checked) {
+            checked->append(i);
+        }
+    }
+    if(checked->isEmpty()) {
+        QMessageBox error;
+        error.critical(this, "ERROR", "No algorithms chosen.");
+        return;
+    }
+
 }

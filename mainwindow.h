@@ -33,10 +33,14 @@ private slots:
 
     void on_listItem_changed(QListWidgetItem* list, QLabel* description, QString* names, QString* desc);
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::MainWindow *ui;
     void createFileBar();
     QDialog* createAlgoList();
+    QString file_path;
+    QListWidget* algoList;
 
 };
 #endif // MAINWINDOW_H
