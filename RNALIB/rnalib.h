@@ -7,13 +7,15 @@
 #include <iostream>
 #include <stdio.h>
 #include <fstream>
+#include <QDir>
+
 
 class RNALIB_EXPORT RNALIB
 {
-public:
-    RNALIB();
+    public:
+        RNALIB();
 
-    void stringToFasta(QString, QString);
+        static void stringToFasta(QString, QString, QString);
 };
 
 #endif // RNALIB_H

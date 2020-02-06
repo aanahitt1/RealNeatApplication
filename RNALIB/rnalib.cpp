@@ -6,10 +6,11 @@ RNALIB::RNALIB()
 
 }
 
-void RNALIB::stringToFasta (QString str, QString name = "temp"){
-    std::string filename = name.toStdString() + ".fasta";
+void RNALIB::stringToFasta (QString str, QString path = QDir::currentPath(), QString name = "temp"){
+
+    QString filename = path + "//" + name + ".fasta";
     std::ofstream fOut;
-    fOut.open(filename, std::ofstream::out);
+    fOut.open(filename.toStdString(), std::ofstream::out);
 
     //FASTA must begin with > and then the sequence name
     fOut << ">" << name.toStdString() << std::endl;
@@ -18,5 +19,6 @@ void RNALIB::stringToFasta (QString str, QString name = "temp"){
 
     fOut.close();
 
-    std::cout << "Conversion Complete";
+    std::cout << "File created Complete";
+
 }
