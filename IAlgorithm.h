@@ -10,14 +10,10 @@ private:
     char* options;
 
 public:
-    IAlgorithm(QString filepath, char opt[]) {
-        file_path = filepath;
-        options = opt;
-    }
-
     virtual QString getStructure() = 0;
     virtual QStringList getInfo() = 0;
     virtual QStringList getOptions() = 0;
+    virtual void initiate(QString filepath, QStringList opt);
 
 };
 
