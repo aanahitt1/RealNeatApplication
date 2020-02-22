@@ -11,7 +11,11 @@
 #include <QListWidget>
 #include <QGridLayout>
 #include <QLabel>
+#include <QSharedPointer>
 #include "parsexml.h"
+#include "RNALIB/rnalib.h"
+#include "IAlgorithm.h"
+#include "optionchooser.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,8 +43,13 @@ private:
     Ui::MainWindow *ui;
     void createFileBar();
     QDialog* createAlgoList();
+    bool checkSequence(QString* sequence);
+    IAlgorithm* loader(QString* filepath, QString name);
+
     QString file_path;
+    QString directory_path;
     QListWidget* algoList;
+    int FASTAcount;
 
 };
 #endif // MAINWINDOW_H

@@ -7,6 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     file_path = "";
+    directory_path = "..\\Documents";
+    FASTAcount = 0;
     algoList = NULL;
     createFileBar();
     setWindowTitle("Real Neat Application");
@@ -21,21 +23,34 @@ void MainWindow::createFileBar()
 {
       QAction *quit = new QAction("&Quit", this);
       QAction* Algorithms = new QAction("&Algorithms", this);
+      QAction* selectDest = new QAction("&Select FASTA destination");
 
       //Creating menu
       QMenu *FileBar;
       FileBar = menuBar()->addMenu("&File");
       FileBar->addAction(Algorithms);
+      FileBar->addAction(selectDest);
       FileBar->addAction(quit);
 
+      //This makes the quit action
       connect(quit, &QAction::triggered, qApp, QApplication::quit);
 
       QDialog* listDialog = createAlgoList();
+      QFileDialog* selection = new QFileDialog();
+      selection->setFileMode(QFileDialog::DirectoryOnly);
 
+      //This shows the algorithm chooser
       connect(Algorithms, &QAction::triggered, listDialog, &QDialog::show);
+
+      //This is about choosing a directory.
+      connect(selectDest, &QAction::triggered, selection, &QDialog::show);
+      connect(selection, &QFileDialog::fileSelected, [=](QString dir){
+          directory_path = dir;
+      });
 
 }
 
+//This method creates the algorithm chooser dialog box.
 QDialog* MainWindow::createAlgoList() {
 
     //Create the dialog window so it looks good.
@@ -88,53 +103,126 @@ void MainWindow::on_listItem_changed(QListWidgetItem* list, QLabel* description,
     }
 }
 
+//This method takes in a String from an input box and saves it as a FASTA file if it is valid, and sets the file path as file_path.
 void MainWindow::on_pushButton_clicked()
 {
     QString sequence = QInputDialog::getText(this, "Sequence", "Insert RNA sequencce: ");
-    sequence = sequence.toUpper();
-    int i = 0;
-    while(sequence[i]!=NULL) {
-        if(sequence[i]!='A' && sequence[i]!='C' && sequence[i]!='U' && sequence[i]!='G') {
-            QMessageBox error;
-            error.critical(this, "ERROR", "This is not a valid RNA sequence");
-            error.setVisible(true);
-            break;
-        }
-        i++;
+    bool valid = checkSequence(&sequence);
+    if(!valid) {
+        QMessageBox::critical(this, "ERROR", "This is not a valid RNA sequence");
     }
-    //Turn the string into a FASTA file
-    //Set file_path to wherever we save it.
+    FASTAcount++;
+    QString name = "Sequence";
+    name.append(QString::number(FASTAcount));
+    file_path = RNALIB::stringToFasta(sequence, directory_path, name);
 }
 
+//This method takes in a .txt or .FASTA file. It turns a .txt file into a .FASTA file and sets the .FASTA file's path as file_path.
 void MainWindow::on_pushButton_2_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open Sequence", "C:\\documents", "Text files (*.txt);;FASTA files (*.FASTA)");
+    QString filename = QFileDialog::getOpenFileName(this, "Open Sequence", "..\\documents", "Text files (*.txt);;FASTA files (*.FASTA)");
     if(filename.contains(".txt")) {
-        //turn it into a FASTA file
-        //Save it somewhere
-        //Set file_path to where we saved it.
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::critical(this, "ERROR", "File not readable.");
+        }
+
+        QString sequence;
+
+        QTextStream s1(&file);
+
+        sequence.append(s1.readAll());
+        bool valid = checkSequence(&sequence);
+        if(!valid) {
+            QMessageBox::critical(this, "ERROR", "This is not a valid RNA sequence");
+        }
+
+        //This creates the FASTA file with the name of the original file.
+        FASTAcount++;
+        QFileInfo* temp = new QFileInfo(file);
+        QString name = temp->baseName();
+        name.append(QString::number(FASTAcount));
+        file_path = RNALIB::stringToFasta(sequence, directory_path, name);
     } else {
         file_path = filename;
     }
 }
 
+//This method checks to make sure a sequence has been selected and an algorithm has been selected, and sends the file to the selected
+//plug ins to generate a 2D structure.
 void MainWindow::on_pushButton_3_clicked()
 {
     if(file_path == "") {
-        QMessageBox error;
-        error.critical(this, "ERROR", "No sequence chosen.");
-        return;
-    }
-    QList<int>* checked = new QList<int>();
-    for (int i = 0; i < algoList->count(); i++) {
-        if(algoList->item(i)->checkState() == Qt::Checked) {
-            checked->append(i);
-        }
-    }
-    if(checked->isEmpty()) {
-        QMessageBox error;
-        error.critical(this, "ERROR", "No algorithms chosen.");
+        QMessageBox::critical(this, "ERROR", "No sequence chosen.");
         return;
     }
 
+    //Here we create a list of the selected algorithms.
+    QList<QSharedPointer<IAlgorithm>>* selectedAlgo = new QList<QSharedPointer<IAlgorithm>>();
+    ParseXML* gopher = new ParseXML();
+    for (int i = 0; i < algoList->count(); i++) {
+        if(algoList->item(i)->checkState() == Qt::Checked) {
+            //Checks to see if we can load the algorithms.
+            IAlgorithm* algoObject = loader(gopher->getPath("C:\\Users\\Anahit\\Documents\\RealNeatApplication\\Config.xml", i), algoList->item(i)->text());
+            if(algoObject == NULL) {
+                QMessageBox::critical(this, "ERROR", "Algorithm not available");
+                break;
+            }
+
+            //Here we get the option list so we can offer it to the user
+            QMap<QString, double> options = algoObject->getOptions();
+
+            OptionChooser* opt = new OptionChooser(options);
+            opt->show();
+
+
+            QSharedPointer<IAlgorithm> ptr(algoObject);
+            selectedAlgo->push_back(ptr);
+        }
+    }
+    if(selectedAlgo->isEmpty()) {
+        QMessageBox::critical(this, "ERROR", "No algorithms chosen.");
+        return;
+    }
+
+
+    //Send the file_path to the checked sequences and receive the dot-bracket/sequence notation
+    //Send actual sequence and dot-bracket notation to Nick's stuff.
+
+}
+
+//This method loads the dll from the given filepath and returns it in type IAlgorithm
+IAlgorithm* MainWindow::loader(QString* libpath, QString name) {
+
+    if(!QLibrary::isLibrary(*libpath)) {
+        QMessageBox::information(this, "Library", "This is not a library");
+        return NULL;
+    }
+
+    QLibrary customDLL(*libpath);
+    if(customDLL.load()) {
+        typedef IAlgorithm* (*customAlgo)();
+        name = "create_" + name;
+        customAlgo temp = (customAlgo)customDLL.resolve(name.toStdString().c_str());
+        if(temp) {
+            IAlgorithm* success = temp();
+            return success;
+        }
+    }
+    return NULL;
+}
+
+//This method checks to make sure the sequence is a valid RNA sequence.
+bool MainWindow::checkSequence(QString* seq) {
+    QString sequence = seq->toUpper();
+    bool valid = true;
+    int i = 0;
+    while(sequence[i]!=NULL) {
+        if(sequence[i]!='A' && sequence[i]!='C' && sequence[i]!='U' && sequence[i]!='G') {
+            valid = false;
+        }
+        i++;
+    }
+
+    return valid;
 }
