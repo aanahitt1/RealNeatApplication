@@ -1,6 +1,6 @@
 #include "optionchooser.h"
 
-OptionChooser::OptionChooser(QMap<QString, double> opt)
+OptionChooser::OptionChooser(QMap<QString, QVariant> opt)
 {
     //This copies the opt list to options so we have the right size list.
     options = opt;
@@ -24,7 +24,7 @@ OptionChooser::OptionChooser(QMap<QString, double> opt)
 
     //Adds the items to the list
     int i =0;
-    QMapIterator<QString, double> itr(options);
+    QMapIterator<QString, QVariant> itr(options);
     while(itr.hasNext()) {
         itr.next();
         optList->addItem(itr.key());
@@ -42,7 +42,7 @@ void OptionChooser::getNumber(QListWidgetItem *item) {
     QString name = item->text();
     if(item->checkState() == Qt::Checked) {
         if(name.contains("Enter")) {
-            double value = QInputDialog::getDouble(NULL, name, "Insert new value: ");
+            QVariant value(QInputDialog::getDouble(NULL, name, "Insert new value: "));
             options.insert(name, value);
         } else {
             options.insert(name, 1);

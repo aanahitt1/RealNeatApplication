@@ -16,6 +16,7 @@
 #include "RNALIB/rnalib.h"
 #include "IAlgorithm.h"
 #include "optionchooser.h"
+#include "graphicswindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -50,6 +51,7 @@ private:
     QString directory_path;
     QListWidget* algoList;
     int FASTAcount;
+    GraphicsWindow* tabWindow;
 
 };
 #endif // MAINWINDOW_H

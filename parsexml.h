@@ -36,8 +36,6 @@ public:
         QString* names = new QString[10];
         QString type = program.tagName();
         int i = 0;
-        names[i] = "bah";
-        //i++;
         while(!program.isNull()) {
             if(program.tagName() == "Program") {
                 QString name = program.attribute(tag);
@@ -52,6 +50,8 @@ public:
         return names;
 
     }
+
+    QString* getPath(QString fileName, int i);
 };
 
 #endif // PARSEXML_H

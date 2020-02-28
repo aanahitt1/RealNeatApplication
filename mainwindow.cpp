@@ -5,11 +5,13 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    //This sets up the main window and sets all bases as they should be.
     ui->setupUi(this);
     file_path = "";
     directory_path = "..\\Documents";
     FASTAcount = 0;
     algoList = NULL;
+    tabWindow = new GraphicsWindow();
     createFileBar();
     setWindowTitle("Real Neat Application");
 }
@@ -170,7 +172,7 @@ void MainWindow::on_pushButton_3_clicked()
             }
 
             //Here we get the option list so we can offer it to the user
-            QMap<QString, double> options = algoObject->getOptions();
+            QMap<QString, QVariant> options = algoObject->getOptions();
 
             OptionChooser* opt = new OptionChooser(options);
             opt->show();
@@ -187,7 +189,7 @@ void MainWindow::on_pushButton_3_clicked()
 
 
     //Send the file_path to the checked sequences and receive the dot-bracket/sequence notation
-    //Send actual sequence and dot-bracket notation to Nick's stuff.
+    //Send actual sequence and dot-bracket notation to the graphics window.
 
 }
 
