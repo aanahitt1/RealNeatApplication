@@ -1,4 +1,0 @@
-<Algorithms>
-	<Program name="DAFS" number=1 desc="Simultaneous aligning and folding of RNA sequences via dual decomposition.">C:/user/Anahit/Documents/DAFS</Program>
-	<Program name="PhyloQFold" number=2 desc="Method that takes advantage of the evolutionary history of a group of aligned RNA sequences for sampling consensus secondary structures, including pseudoknots, according to their approximate posterior probability.">C:/user/Anahit/Documents/PhyloQFold</Program>
-</Algorithms>
