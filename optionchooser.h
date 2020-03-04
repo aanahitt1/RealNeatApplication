@@ -15,19 +15,23 @@
 
 class OptionChooser : public QObject
 {
+    Q_OBJECT
+
 private:
-    QMap<QString, QVariant> options;
+    QMap<QString, double> options;
     QListWidget* optList;
     QDialog* main;
 
+    void emitBoxClosed();
+
 public:
-    OptionChooser(QMap<QString, QVariant> opt);
+    OptionChooser(QMap<QString, double> opt);
 
     void getNumber(QListWidgetItem* item);
     void show();
 
 signals:
-   void boxClosed(QString opt);
+   void boxClosed(QMap<QString, double>);
 };
 
 #endif // OPTIONCHOOSER_H

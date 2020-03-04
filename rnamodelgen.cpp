@@ -37,12 +37,10 @@ void RNAModelGen::generate2DModel(QString filepath){
     // start RNAplot
     rnaPlot->setProgram(rnaPlotCmd);
     rnaPlot->setArguments(rnaPlotArgs);
-    rnaPlot->startDetached();
+    rnaPlot->start();
     rnaPlot->write(array);
 
     rnaPlot->waitForFinished();
-    rnaPlot->waitForReadyRead();
-    rnaPlot->waitForBytesWritten();
 }
 
 void RNAModelGen::processError(QProcess::ProcessError error){

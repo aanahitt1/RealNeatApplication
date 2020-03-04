@@ -172,11 +172,16 @@ void MainWindow::on_pushButton_3_clicked()
             }
 
             //Here we get the option list so we can offer it to the user
-            QMap<QString, QVariant> options = algoObject->getOptions();
+            QMap<QString, double> options = algoObject->getOptions();
 
             OptionChooser* opt = new OptionChooser(options);
             opt->show();
 
+            //The connect needs to bring everything together - the graphics window only shows when the options are chosen and
+            //OptionChooser is closed.
+            connect(opt, &OptionChooser::boxClosed, [=](QMap<QString, double> options) {
+                showTab(options, algoObject);
+            });
 
             QSharedPointer<IAlgorithm> ptr(algoObject);
             selectedAlgo->push_back(ptr);
@@ -187,9 +192,23 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
+}
 
-    //Send the file_path to the checked sequences and receive the dot-bracket/sequence notation
-    //Send actual sequence and dot-bracket notation to the graphics window.
+//This algorithm takes the options, runs it to the IAlgorithm, and puts the structure into the FASTA, then opens the tab
+void MainWindow::showTab(QMap<QString, double> options, IAlgorithm* algo) {
+    QString structure = algo->initiate(file_path, options);
+
+    //Add structure to FASTA
+    QFile fasta(file_path);
+    if(fasta.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        QTextStream stream(&fasta);
+
+        stream << "\n" << structure;
+
+        fasta.close();
+    }
+
+    tabWindow->show(file_path);
 
 }
 
