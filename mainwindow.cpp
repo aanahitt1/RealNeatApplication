@@ -200,7 +200,7 @@ void MainWindow::showTab(QMap<QString, double> options, IAlgorithm* algo) {
 
     //Add structure to FASTA
     QFile fasta(file_path);
-    if(fasta.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+    if(fasta.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text)) {
         QTextStream stream(&fasta);
 
         stream << "\n" << structure;

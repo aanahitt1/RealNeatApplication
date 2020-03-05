@@ -23,7 +23,7 @@ public:
     //Initiate with filepath to FASTA file and a QStringList of options, should run the program with given info and store everything until called
     //"Opt" is given as a QStringList of the same length as the one given when getOptions() is called, filled with 1 (chosen), 0 (not chosen),
         //or the number asked for. The plug in must convert this to the right commands
-    virtual QString initiate(QString filepath, QMap<QString, double> opt) = 0;
+    virtual QString initiate(QString filepath, QMap<QString, double> opt);
     virtual ~IAlgorithm(){};
 
 };
